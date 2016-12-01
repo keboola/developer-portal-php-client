@@ -6,15 +6,11 @@
  */
 namespace Keboola\DeveloperPortal;
 
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Log\LoggerInterface;
 
 class Client
 {
@@ -45,6 +41,9 @@ class Client
 
     public function __construct($url, array $options = [])
     {
+        if (substr($url, -1) != '/') {
+            $url .= '/';
+        }
         $options['base_uri'] = $url;
         $this->guzzleOptions = $options;
         $this->initClient();
