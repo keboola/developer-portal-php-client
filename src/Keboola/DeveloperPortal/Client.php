@@ -102,7 +102,13 @@ class Client
     }
 
     /**
-     * @return ResponseInterface
+     * @param $method
+     * @param $uri
+     * @param array $params
+     * @param array $headers
+     * @param int $retries
+     * @return array
+     * @throws Exception
      */
     public function request($method, $uri, $params = [], $headers = [], $retries = 5)
     {
@@ -144,6 +150,16 @@ class Client
         }
     }
 
+    /**
+     * Auth
+     */
+
+    /**
+     * @param $username
+     * @param $password
+     * @return mixed
+     * @throws Exception
+     */
     public function login($username, $password)
     {
         $this->username = $username;
@@ -160,6 +176,13 @@ class Client
         return $response['token'];
     }
 
+    /**
+     * @param $method
+     * @param $uri
+     * @param array $params
+     * @return array
+     * @throws Exception
+     */
     public function authRequest($method, $uri, $params = [])
     {
         if (!$this->token) {
@@ -170,6 +193,16 @@ class Client
         ]);
     }
 
+    /**
+     * Admin API
+     */
+
+    /**
+     * @param null $filter
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
     public function adminListAppsPaginated($filter = null, $offset = 0, $limit = 1000)
     {
         return $this->authRequest('GET', 'admin/apps', [
@@ -179,6 +212,10 @@ class Client
         ]);
     }
 
+    /**
+     * @param null $filter
+     * @return array
+     */
     public function adminListApps($filter = null)
     {
         $offset = 0;
@@ -192,8 +229,92 @@ class Client
         return $result;
     }
 
+    /**
+     * @param $id
+     * @return array
+     */
     public function adminGetApp($id)
     {
         return $this->authRequest('GET', 'admin/apps/' . $id);
+    }
+
+    /**
+     * Vendors
+     */
+
+    /**
+     * @param $vendor
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
+    public function listVendorsAppsPaginated($vendor, $offset = 0, $limit = 1000)
+    {
+        return $this->authRequest('GET', sprintf('vendors/%s/apps', $vendor), [
+            'offset' => $offset,
+            'limit' => $limit
+        ]);
+    }
+
+    /**
+     * Apps
+     */
+
+    /**
+     * Pass attributes of the new app in $params array:
+     *
+     *      [
+     *         'id'     => 'ex-adwords',
+     *         'name'   => 'AdWords Reports',
+     *         'type'   => 'extractor',
+     *          ...
+     *      ]
+     *
+     * @param $vendor
+     * @param $params
+     * @return array
+     */
+    public function createApp($vendor, $params)
+    {
+        return $this->authRequest('POST', sprintf('vendors/%s/apps', $vendor), $params);
+    }
+
+    /**
+     * Get Apps ECR repository credentials
+     *
+     * @param $vendor
+     * @param $app
+     * @return array
+     */
+    public function getAppRepository($vendor, $app)
+    {
+        return $this->authRequest('GET', sprintf('vendors/%s/apps/%s/repository', $vendor, $app));
+    }
+
+    /**
+     * Public API
+     */
+
+    /**
+     * @param int $offset
+     * @param int $limit
+     * @return array
+     */
+    public function publicListVendorsPaginated($offset = 0, $limit = 1000)
+    {
+        return $this->request('GET', 'vendors', [
+            'offset' => $offset,
+            'limit' => $limit
+        ]);
+    }
+
+    /**
+     * @param $vendor
+     * @param $id
+     * @return array
+     */
+    public function publicGetAppDetail($vendor, $id)
+    {
+        return $this->request('GET', sprintf('apps/%s/%s', $vendor, $id));
     }
 }

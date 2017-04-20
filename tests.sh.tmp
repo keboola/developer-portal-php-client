@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+export KBDP_API_URL=""
+export KBDP_USERNAME=""
+export KBDP_PASSWORD=""
+export KBDP_VENDOR="phpclient"
+
+./vendor/bin/phpunit --verbose --debug
