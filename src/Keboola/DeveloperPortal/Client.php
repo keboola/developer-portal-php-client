@@ -37,9 +37,12 @@ class Client
 
     protected $username;
     protected $password;
-    protected $token;
 
-    public function __construct($url, array $options = [])
+    protected $token;
+    protected $accessToken;
+    protected $refreshToken;
+
+    public function __construct($url, array $options = [], array $credentials = [])
     {
         if (substr($url, -1) != '/') {
             $url .= '/';
@@ -47,6 +50,18 @@ class Client
         $options['base_uri'] = $url;
         $this->guzzleOptions = $options;
         $this->initClient();
+        if (!empty($credentials)) {
+            $this->setCredentials($credentials);
+        }
+    }
+
+    protected function setCredentials($credentials)
+    {
+        foreach (['token', 'accessToken', 'refreshToken'] as $key) {
+            if (!empty($credentials[$key])) {
+                $this->$key = $credentials[$key];
+            }
+        }
     }
 
     protected function initClient()
@@ -139,7 +154,7 @@ class Client
                     if ($retries <= 0) {
                         throw $e;
                     }
-                    $this->login($this->username, $this->password);
+                    $this->refreshToken();
                     return $this->request($method, $uri, $params, $headers, $retries-1);
                 }
 
@@ -173,7 +188,10 @@ class Client
             throw Exception::authError('auth/login', $response, 'Missing token');
         }
         $this->token = $response['token'];
-        return $response['token'];
+        $this->accessToken = $response['accessToken'];
+        $this->refreshToken = $response['accessToken'];
+
+        return $response;
     }
 
     /**
@@ -191,6 +209,16 @@ class Client
         return $this->request($method, $uri, $params, [
             'Authorization' => $this->token
         ]);
+    }
+
+    public function refreshToken()
+    {
+        $token = $this->request('GET', 'auth/token', [], [
+            'Authorization' => $this->refreshToken
+        ]);
+
+        $this->token = $token['token'];
+        return $token['token'];
     }
 
     /**

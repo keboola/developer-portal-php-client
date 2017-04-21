@@ -11,14 +11,6 @@ use Keboola\DeveloperPortal\Exception;
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
-    {
-        // prepare test environment
-        $client = new Client(KBDP_API_URL);
-        $response = $client->login(KBDP_USERNAME, KBDP_PASSWORD);
-        $res = $client->listVendorsAppsPaginated(KBDP_VENDOR);
-    }
-
     public function testLoginBadUsername()
     {
         $client = new Client(KBDP_API_URL);
@@ -35,6 +27,16 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client = new Client(KBDP_API_URL);
         $response = $client->login(KBDP_USERNAME, KBDP_PASSWORD);
         $this->assertNotEmpty($response);
+    }
+
+    public function testSetCredentials()
+    {
+        $client = new Client(KBDP_API_URL);
+        $tokens = $client->login(KBDP_USERNAME, KBDP_PASSWORD);
+
+        $client2 = new Client(KBDP_API_URL, [], $tokens);
+        $apps = $client2->adminListApps();
+        $this->assertNotEmpty($apps);
     }
 
     public function testAdminListApps()
