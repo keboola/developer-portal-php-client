@@ -42,16 +42,33 @@ class Client
     protected $accessToken;
     protected $refreshToken;
 
-    public function __construct($url, array $options = [], array $credentials = [])
+    /**
+     * Client constructor
+     *
+     * $url - API endpoint
+     * $options - additional options:
+     *
+     *      [
+     *          'credentials' => [
+     *              'token' => DEVELOPER PORTAL API TOKEN
+     *              'refreshToken => DEVELOPER PORTAL API REFRESH TOKEN
+     *          ],
+     *          'options' => GUZZLE HTTP CLIENT OPTIONS
+     *      ]
+     *
+     * @param $url
+     * @param array $options
+     */
+    public function __construct($url, array $options = [])
     {
         if (substr($url, -1) != '/') {
             $url .= '/';
         }
-        $options['base_uri'] = $url;
-        $this->guzzleOptions = $options;
+        $options['options']['base_uri'] = $url;
+        $this->guzzleOptions = $options['options'];
         $this->initClient();
-        if (!empty($credentials)) {
-            $this->setCredentials($credentials);
+        if (!empty($options['credentials'])) {
+            $this->setCredentials($options['credentials']);
         }
     }
 

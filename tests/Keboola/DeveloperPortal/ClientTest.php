@@ -34,7 +34,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client = new Client(KBDP_API_URL);
         $tokens = $client->login(KBDP_USERNAME, KBDP_PASSWORD);
 
-        $client2 = new Client(KBDP_API_URL, [], $tokens);
+        $client2 = new Client(KBDP_API_URL, ['credentials' => $tokens]);
         $apps = $client2->adminListApps();
         $this->assertNotEmpty($apps);
     }
