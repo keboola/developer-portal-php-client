@@ -337,6 +337,29 @@ class Client
     }
 
     /**
+     * Pass attributes of the app in $params array:
+     *
+     *      [
+     *         'repository' => [
+     *              'type' => 'ecr',
+     *              'uri'  => 'my.repo.uri',
+     *              'tag'  => '1.23.0',
+     *              'options' => []
+     *          ]
+     *          ...
+     *      ]
+     *
+     * @param $vendor
+     * @param $id
+     * @param $payload
+     * @return array
+     */
+    public function updateApp($vendor, $id, $params)
+    {
+        return $this->authRequest('PATCH', sprintf('vendors/%s/apps/%s', $vendor, $id), $params);
+    }
+
+    /**
      * Public API
      */
 

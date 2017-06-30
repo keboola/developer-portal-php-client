@@ -18,7 +18,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $client->login(uniqid().'@'.uniqid().'.com', KBDP_PASSWORD);
             $this->fail();
         } catch (Exception $e) {
-            $this->assertEquals(404, $e->getCode());
+            $this->assertEquals(403, $e->getCode());
         }
     }
 
@@ -86,7 +86,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('type', $res[0]);
         $this->assertArrayHasKey('createdOn', $res[0]);
         $this->assertArrayHasKey('createdBy', $res[0]);
-        $this->assertArrayHasKey('isApproved', $res[0]);
+        $this->assertArrayHasKey('isPublic', $res[0]);
         $this->assertArrayHasKey('legacyUri', $res[0]);
     }
 
@@ -128,7 +128,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('loggerConfiguration', $res);
         $this->assertArrayHasKey('stagingStorageInput', $res);
         $this->assertArrayHasKey('isPublic', $res);
-        $this->assertArrayHasKey('isApproved', $res);
         $this->assertArrayHasKey('uri', $res);
         $this->assertArrayHasKey('vendor', $res);
         $this->assertArrayHasKey('id', $res['vendor']);
@@ -157,5 +156,37 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('credentials', $res);
         $this->assertArrayHasKey('username', $res['credentials']);
         $this->assertArrayHasKey('password', $res['credentials']);
+    }
+
+    public function testUpdateApp()
+    {
+        $client = new Client(KBDP_API_URL);
+        $client->login(KBDP_USERNAME, KBDP_PASSWORD);
+
+        $apps = $client->listVendorsAppsPaginated(KBDP_VENDOR);
+        $app = $client->publicGetAppDetail(KBDP_VENDOR, $apps[0]['id']);
+
+        $payload = [
+            "repository" => [
+                "type" => "builder",
+                "uri" => "fake/repository",
+                "tag" => "1.2.3",
+                "options" => []
+            ]
+        ];
+        $client->updateApp(KBDP_VENDOR, $apps[0]['id'], $payload);
+
+        $updatedApp = $client->publicGetAppDetail(KBDP_VENDOR, $apps[0]['id']);
+
+        foreach ($updatedApp as $key => $value) {
+            if ($key === "repository") {
+                $this->assertEquals('builder', $value['type']);
+                $this->assertEquals('fake/repository', $value['uri']);
+                $this->assertEquals("1.2.3", $value['tag']);
+                $this->assertEquals([], $value['options']);
+            } else {
+                $this->assertEquals($app[$key], $value);
+            }
+        }
     }
 }
