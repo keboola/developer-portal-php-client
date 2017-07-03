@@ -179,19 +179,17 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $updatedApp = $client->publicGetAppDetail(KBDP_VENDOR, $apps[0]['id']);
 
-        foreach ($updatedApp as $key => $value) {
-            if ($key === "repository") {
-                $this->assertEquals($app['repository']['type'], $value['type']);
-                $this->assertEquals($app['repository']['uri'], $value['uri']);
-                $this->assertEquals($randomTag, $value['tag']);
-                $this->assertEquals([], $value['options']);
-            } else {
-                if ($key === "version") {
-                    $this->assertEquals($app[$key] + 1, $value);
-                } else {
-                    $this->assertEquals($app[$key], $value);
-                }
-            }
+        // assert changed values
+        $this->assertEquals($app['repository']['type'], $updatedApp['repository']['type']);
+        $this->assertEquals($app['repository']['uri'], $updatedApp['repository']['uri']);
+        $this->assertEquals($randomTag, $updatedApp['repository']['tag']);
+        $this->assertEquals([],  $updatedApp['repository']['options']);
+        $this->assertEquals($app['version'] + 1, $updatedApp['version']);
+        // assert values which should remain same
+        function removeKeys($array, $keys) {
+            return array_diff_key($array, array_flip($keys));
         }
+        $keysToRemove = ['repository', 'version'];
+        $this->assertEquals(removeKeys($app, $keysToRemove), removeKeys($updatedApp, $keysToRemove));
     }
 }
