@@ -172,8 +172,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             "repository" => [
                 "type" => $app['repository']['type'],
                 "uri" => $app['repository']['uri'],
-                "tag" => $randomTag,
-                "options" => []
+                "tag" => $randomTag
             ]
         ];
         $client->updateApp(KBDP_VENDOR, $apps[0]['id'], $payload);
@@ -187,7 +186,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
                 $this->assertEquals($randomTag, $value['tag']);
                 $this->assertEquals([], $value['options']);
             } else {
-                $this->assertEquals($app[$key], $value);
+                if ($key === "version") {
+                    $this->assertEquals($app[$key] + 1, $value);
+                } else {
+                    $this->assertEquals($app[$key], $value);
+                }
             }
         }
     }
