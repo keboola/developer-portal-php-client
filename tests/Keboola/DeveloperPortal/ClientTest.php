@@ -183,10 +183,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($app['repository']['type'], $updatedApp['repository']['type']);
         $this->assertEquals($app['repository']['uri'], $updatedApp['repository']['uri']);
         $this->assertEquals($randomTag, $updatedApp['repository']['tag']);
-        $this->assertEquals([],  $updatedApp['repository']['options']);
+        $this->assertEquals([], $updatedApp['repository']['options']);
         $this->assertEquals($app['version'] + 1, $updatedApp['version']);
         // assert values which should remain same
-        function removeKeys($array, $keys) {
+        function removeKeys($array, $keys)
+        {
             return array_diff_key($array, array_flip($keys));
         }
         $keysToRemove = ['repository', 'version'];
