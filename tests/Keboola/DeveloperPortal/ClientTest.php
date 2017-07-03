@@ -166,11 +166,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $apps = $client->listVendorsAppsPaginated(KBDP_VENDOR);
         $app = $client->publicGetAppDetail(KBDP_VENDOR, $apps[0]['id']);
 
+        $randomTag = rand(0, 10) . "." . rand(0, 10) . "." . rand(0, 10);
+
         $payload = [
             "repository" => [
-                "type" => "builder",
-                "uri" => "fake/repository",
-                "tag" => "1.2.3",
+                "type" => $app['repository']['type'],
+                "uri" => $app['repository']['uri'],
+                "tag" => $randomTag,
                 "options" => []
             ]
         ];
@@ -180,9 +182,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         foreach ($updatedApp as $key => $value) {
             if ($key === "repository") {
-                $this->assertEquals('builder', $value['type']);
-                $this->assertEquals('fake/repository', $value['uri']);
-                $this->assertEquals("1.2.3", $value['tag']);
+                $this->assertEquals($app['repository']['type'], $value['type']);
+                $this->assertEquals($app['repository']['uri'], $value['uri']);
+                $this->assertEquals($randomTag, $value['tag']);
                 $this->assertEquals([], $value['options']);
             } else {
                 $this->assertEquals($app[$key], $value);
