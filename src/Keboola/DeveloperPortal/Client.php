@@ -377,12 +377,11 @@ class Client
     }
 
     /**
-     * @param $vendor
-     * @param $id
+     * @param $appId
      * @return array
      */
-    public function publicGetAppDetail($vendor, $id)
+    public function publicGetAppDetail($appId)
     {
-        return $this->request('GET', sprintf('apps/%s/%s', $vendor, $id));
+        return $this->request('GET', sprintf('apps/%s', $appId));
     }
 }
