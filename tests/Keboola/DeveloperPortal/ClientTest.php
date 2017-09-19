@@ -87,7 +87,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('createdOn', $res[0]);
         $this->assertArrayHasKey('createdBy', $res[0]);
         $this->assertArrayHasKey('isPublic', $res[0]);
-        $this->assertArrayHasKey('legacyUri', $res[0]);
     }
 
     public function testPublicGetAppDetail()
