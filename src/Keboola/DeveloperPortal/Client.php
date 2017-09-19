@@ -59,7 +59,7 @@ class Client
      * @param $url
      * @param array $options
      */
-    public function __construct($url, array $options = [])
+    public function __construct($url = 'https://apps-api.keboola.com/', array $options = [])
     {
         if (substr($url, -1) != '/') {
             $url .= '/';
@@ -377,12 +377,11 @@ class Client
     }
 
     /**
-     * @param $vendor
-     * @param $id
+     * @param $appId
      * @return array
      */
-    public function publicGetAppDetail($vendor, $id)
+    public function publicGetAppDetail($appId)
     {
-        return $this->request('GET', sprintf('apps/%s/%s', $vendor, $id));
+        return $this->request('GET', sprintf('apps/%s', $appId));
     }
 }

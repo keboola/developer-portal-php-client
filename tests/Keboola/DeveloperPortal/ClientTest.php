@@ -87,7 +87,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('createdOn', $res[0]);
         $this->assertArrayHasKey('createdBy', $res[0]);
         $this->assertArrayHasKey('isPublic', $res[0]);
-        $this->assertArrayHasKey('legacyUri', $res[0]);
     }
 
     public function testPublicGetAppDetail()
@@ -95,7 +94,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client = new Client(KBDP_API_URL);
         $client->login(KBDP_USERNAME, KBDP_PASSWORD);
         $apps = $client->listVendorsAppsPaginated(KBDP_VENDOR);
-        $res = $client->publicGetAppDetail(KBDP_VENDOR, $apps[0]['id']);
+        $res = $client->publicGetAppDetail($apps[0]['id']);
         $this->assertArrayHasKey('id', $res);
         $this->assertArrayHasKey('name', $res);
         $this->assertArrayHasKey('version', $res);
@@ -164,7 +163,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->login(KBDP_USERNAME, KBDP_PASSWORD);
 
         $apps = $client->listVendorsAppsPaginated(KBDP_VENDOR);
-        $app = $client->publicGetAppDetail(KBDP_VENDOR, $apps[0]['id']);
+        $app = $client->publicGetAppDetail($apps[0]['id']);
 
         $randomTag = rand(0, 10) . "." . rand(0, 10) . "." . rand(0, 10);
 
@@ -177,7 +176,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         ];
         $client->updateApp(KBDP_VENDOR, $apps[0]['id'], $payload);
 
-        $updatedApp = $client->publicGetAppDetail(KBDP_VENDOR, $apps[0]['id']);
+        $updatedApp = $client->publicGetAppDetail($apps[0]['id']);
 
         // assert changed values
         $this->assertEquals($app['repository']['type'], $updatedApp['repository']['type']);
