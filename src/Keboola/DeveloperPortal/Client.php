@@ -32,15 +32,15 @@ class Client
     ];
 
     /** @var  \GuzzleHttp\Client */
-    protected $guzzle;
-    protected $guzzleOptions;
+    private $guzzle;
+    private $guzzleOptions;
 
-    protected $username;
-    protected $password;
+    private $username;
+    private $password;
 
-    protected $token;
-    protected $accessToken;
-    protected $refreshToken;
+    private $token;
+    private $accessToken;
+    private $refreshToken;
 
     /**
      * Client constructor
@@ -72,7 +72,7 @@ class Client
         }
     }
 
-    protected function setCredentials($credentials)
+    private function setCredentials($credentials)
     {
         foreach (['token', 'accessToken', 'refreshToken'] as $key) {
             if (!empty($credentials[$key])) {
@@ -81,7 +81,7 @@ class Client
         }
     }
 
-    protected function initClient()
+    private function initClient()
     {
         $handlerStack = HandlerStack::create();
 
