@@ -351,7 +351,7 @@ class Client
      *
      * @param $vendor
      * @param $id
-     * @param $payload
+     * @param $params
      * @return array
      */
     public function updateApp($vendor, $id, $params)
