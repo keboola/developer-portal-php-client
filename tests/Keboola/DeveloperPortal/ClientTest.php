@@ -29,6 +29,30 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($response);
     }
 
+    public function testEmptyEmail()
+    {
+        $client = new Client(KBDP_API_URL);
+        try {
+            $client->login('', KBDP_PASSWORD);
+            $this->fail();
+        } catch (Exception $e) {
+            $this->assertEquals(422, $e->getCode());
+            $this->assertContains('email must be a string', $e->getMessage());
+        }
+    }
+
+    public function testEmptyUrl()
+    {
+        $client = new Client('');
+        try {
+            $client->login(KBDP_USERNAME, KBDP_PASSWORD);
+            $this->fail();
+        } catch (Exception $e) {
+            $this->assertEquals(422, $e->getCode());
+            $this->assertContains('url is not valid', $e->getMessage());
+        }
+    }
+
     public function testSetCredentials()
     {
         $client = new Client(KBDP_API_URL);
@@ -94,6 +118,19 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('createdOn', $res[0]);
         $this->assertArrayHasKey('createdBy', $res[0]);
         $this->assertArrayHasKey('isPublic', $res[0]);
+    }
+
+    public function testListVendorsAppsBadVendor()
+    {
+        $client = new Client(KBDP_API_URL);
+        try {
+            $client->login(KBDP_USERNAME, KBDP_PASSWORD);
+            $client->listVendorsAppsPaginated('badvendor');
+            $this->fail();
+        } catch (Exception $e) {
+            $this->assertEquals(403, $e->getCode());
+            $this->assertContains('no access to vendor badvendor', $e->getMessage());
+        }
     }
 
     public function testPublicGetAppDetail()
