@@ -112,7 +112,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('forwardToken', $res);
         $this->assertArrayHasKey('forwardTokenDetails', $res);
         $this->assertArrayHasKey('injectEnvironment', $res);
-        $this->assertArrayHasKey('cpuShares', $res);
         $this->assertArrayHasKey('uiOptions', $res);
         $this->assertArrayHasKey('imageParameters', $res);
         $this->assertArrayHasKey('testConfiguration', $res);
