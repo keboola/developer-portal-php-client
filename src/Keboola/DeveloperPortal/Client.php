@@ -276,11 +276,16 @@ class Client
 
     /**
      * @param $id
+     * @param boolean $published
      * @return array
      */
-    public function adminGetApp($id)
+    public function adminGetApp($id, $published = false)
     {
-        return $this->authRequest('GET', 'admin/apps/' . $id);
+        $uri = 'admin/apps/' . $id;
+        if ($published) {
+            $uri .= '?published=true';
+        }
+        return $this->authRequest('GET', $uri);
     }
 
     /**
@@ -299,6 +304,15 @@ class Client
             'offset' => $offset,
             'limit' => $limit
         ]);
+    }
+
+    /**
+     * @param $id
+     * @return array
+     */
+    public function getAppDetail($vendor, $id)
+    {
+        return $this->authRequest('GET', "vendors/$vendor/apps/$id");
     }
 
     /**

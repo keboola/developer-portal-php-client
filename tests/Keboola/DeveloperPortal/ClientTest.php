@@ -54,10 +54,17 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $client = new Client(KBDP_API_URL);
         $client->login(KBDP_USERNAME, KBDP_PASSWORD);
-        $res = $client->adminListAppsPaginated(null, 0, 1);
+
+        $resApps = $client->adminListAppsPaginated(null, 0, 1);
+        $this->assertNotEmpty($resApps);
+        $this->assertArrayHasKey('id', $resApps[0]);
+
+        $res = $client->adminGetApp($resApps[0]['id']);
         $this->assertNotEmpty($res);
-        $this->assertArrayHasKey('id', $res[0]);
-        $res = $client->adminGetApp($res[0]['id']);
+        $this->assertArrayHasKey('id', $res);
+        $this->assertArrayHasKey('icon', $res);
+
+        $res = $client->adminGetApp($resApps[0]['id'], true);
         $this->assertNotEmpty($res);
         $this->assertArrayHasKey('id', $res);
         $this->assertArrayHasKey('icon', $res);
@@ -143,6 +150,17 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('64', $res['icon']);
     }
 
+    public function testGetAppDetail()
+    {
+        $client = new Client(KBDP_API_URL);
+        $client->login(KBDP_USERNAME, KBDP_PASSWORD);
+        $apps = $client->listVendorsAppsPaginated(KBDP_VENDOR);
+        $res = $client->getAppDetail(KBDP_VENDOR, $apps[0]['id']);
+        $this->assertArrayHasKey('id', $res);
+        $this->assertArrayHasKey('name', $res);
+        $this->assertArrayHasKey('version', $res);
+    }
+
     public function testGetAppRepository()
     {
         $client = new Client(KBDP_API_URL);
@@ -163,7 +181,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client->login(KBDP_USERNAME, KBDP_PASSWORD);
 
         $apps = $client->listVendorsAppsPaginated(KBDP_VENDOR);
-        $app = $client->publicGetAppDetail($apps[0]['id']);
+        $app = $client->getAppDetail(KBDP_VENDOR, $apps[0]['id']);
 
         $randomTag = rand(0, 10) . "." . rand(0, 10) . "." . rand(0, 10);
 
@@ -176,7 +194,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         ];
         $client->updateApp(KBDP_VENDOR, $apps[0]['id'], $payload);
 
-        $updatedApp = $client->publicGetAppDetail($apps[0]['id']);
+        $updatedApp = $client->getAppDetail(KBDP_VENDOR, $apps[0]['id']);
 
         // assert changed values
         $this->assertEquals($app['repository']['type'], $updatedApp['repository']['type']);
@@ -189,7 +207,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         {
             return array_diff_key($array, array_flip($keys));
         }
-        $keysToRemove = ['repository', 'version'];
+        $keysToRemove = ['repository', 'version', 'createdOn'];
         $this->assertEquals(removeKeys($app, $keysToRemove), removeKeys($updatedApp, $keysToRemove));
     }
 }
