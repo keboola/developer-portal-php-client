@@ -276,13 +276,13 @@ class Client
 
     /**
      * @param $id
-     * @param boolean $published
+     * @param array $options
      * @return array
      */
-    public function adminGetApp($id, $published = false)
+    public function adminGetApp($id, $options = [])
     {
         $uri = 'admin/apps/' . $id;
-        if ($published) {
+        if (!empty($options['published'])) {
             $uri .= '?published=true';
         }
         return $this->authRequest('GET', $uri);

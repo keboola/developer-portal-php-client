@@ -64,7 +64,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('id', $res);
         $this->assertArrayHasKey('icon', $res);
 
-        $res = $client->adminGetApp($resApps[0]['id'], true);
+        $res = $client->adminGetApp($resApps[0]['id'], ['published' => true]);
         $this->assertNotEmpty($res);
         $this->assertArrayHasKey('id', $res);
         $this->assertArrayHasKey('icon', $res);
@@ -119,7 +119,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('forwardToken', $res);
         $this->assertArrayHasKey('forwardTokenDetails', $res);
         $this->assertArrayHasKey('injectEnvironment', $res);
-        $this->assertArrayHasKey('cpuShares', $res);
         $this->assertArrayHasKey('uiOptions', $res);
         $this->assertArrayHasKey('imageParameters', $res);
         $this->assertArrayHasKey('testConfiguration', $res);
