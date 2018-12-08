@@ -29,6 +29,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($response);
     }
 
+    public function testRefreshToken()
+    {
+        $client = new Client(KBDP_API_URL);
+        $client->login(KBDP_USERNAME, KBDP_PASSWORD);
+        $token = $client->refreshToken();
+        $this->assertNotEmpty($token);
+    }
+
     public function testEmptyEmail()
     {
         $client = new Client(KBDP_API_URL);
