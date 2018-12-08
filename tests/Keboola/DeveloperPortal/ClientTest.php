@@ -206,7 +206,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         {
             return array_diff_key($array, array_flip($keys));
         }
-        $keysToRemove = ['repository', 'version', 'createdOn'];
+        $keysToRemove = ['repository', 'version', 'createdOn', 'updatedOn', 'publishedVersion', 'updatedBy'];
         $this->assertEquals(removeKeys($app, $keysToRemove), removeKeys($updatedApp, $keysToRemove));
     }
 }
