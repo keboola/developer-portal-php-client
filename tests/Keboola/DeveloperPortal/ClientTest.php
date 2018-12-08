@@ -128,8 +128,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $client->listVendorsAppsPaginated('badvendor');
             $this->fail();
         } catch (Exception $e) {
-            $this->assertEquals(403, $e->getCode());
-            $this->assertContains('no access to vendor badvendor', $e->getMessage());
+            $this->assertEquals(404, $e->getCode());
+            $this->assertContains('Vendor badvendor does not exist', $e->getMessage());
         }
     }
 
