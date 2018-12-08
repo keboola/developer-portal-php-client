@@ -61,6 +61,9 @@ class Client
      */
     public function __construct($url = 'https://apps-api.keboola.com/', array $options = [])
     {
+        if (empty(trim($url))) {
+            throw Exception::userError(sprintf('The provided API endpoint URL "%s" is invalid.', $url));
+        }
         if (substr($url, -1) != '/') {
             $url .= '/';
         }
