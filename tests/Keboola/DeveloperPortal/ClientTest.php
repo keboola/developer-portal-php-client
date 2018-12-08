@@ -43,13 +43,13 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyUrl()
     {
-        $client = new Client('');
         try {
+            $client = new Client('');
             $client->login(KBDP_USERNAME, KBDP_PASSWORD);
             $this->fail();
         } catch (Exception $e) {
-            $this->assertEquals(422, $e->getCode());
-            $this->assertContains('url is not valid', $e->getMessage());
+            $this->assertEquals(400, $e->getCode());
+            $this->assertContains('The provided API endpoint URL "" is invalid.', $e->getMessage());
         }
     }
 
