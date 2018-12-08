@@ -209,7 +209,7 @@ class Client
         }
         $this->token = $response['token'];
         $this->accessToken = $response['accessToken'];
-        $this->refreshToken = $response['accessToken'];
+        $this->refreshToken = $response['refreshToken'];
 
         return $response;
     }
