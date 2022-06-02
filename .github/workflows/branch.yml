@@ -1,0 +1,39 @@
+name: Branch workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+env:
+  KBDP_API_URL: "https://m6bs0o8sg5.execute-api.us-east-1.amazonaws.com/test"
+  KBDP_USERNAME: "keboola.dev.portal.test@gmail.com"
+  KBDP_PASSWORD: ${{ secrets.KBDP_PASSWORD }}
+  KBDP_VENDOR: "phpclient"
+
+jobs:
+  build:
+    name: "Build"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions:
+          - '5.6'
+          - '7.2'
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Setup PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+      - name: "Install dependencies"
+        run: composer install -n --no-scripts
+      - name: "Run tests"
+        run: |
+          ./vendor/bin/phpcs --standard=psr2 -n --ignore=vendor .
+          ./vendor/bin/phpunit

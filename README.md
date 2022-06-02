@@ -1,8 +1,8 @@
-# developer-portal-php-client
+# Developer Portal PHP Client
 
-[![Build Status](https://travis-ci.org/keboola/developer-portal-php-client.svg?branch=master)](https://travis-ci.org/keboola/developer-portal-php-client)
+[![Branch workflow](https://github.com/keboola/developer-portal-php-client/actions/workflows/branch.yml/badge.svg)](https://github.com/keboola/developer-portal-php-client/actions/workflows/branch.yml)
 
-PHP Client for Keboola Developer Portal
+PHP Client library for [Keboola Developer Portal](https://kebooladeveloperportal.docs.apiary.io/#).
 
 ## License
 
