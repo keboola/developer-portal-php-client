@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - main
 
 env:
   KBDP_API_URL: "https://m6bs0o8sg5.execute-api.us-east-1.amazonaws.com/test"
