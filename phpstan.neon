@@ -1,0 +1,11 @@
+parameters:
+    level: max
+    checkMissingIterableValueType: false
+    paths:
+        - src
+        - tests
+    ignoreErrors:
+    	- '#Property Keboola\\DeveloperPortal\\Client::\$accessToken is never read, only written\.#'
+
+includes:
+    - vendor/phpstan/phpstan-phpunit/extension.neon

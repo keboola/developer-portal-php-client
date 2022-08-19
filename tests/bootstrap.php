@@ -1,30 +1,18 @@
 <?php
-define('ROOT_PATH', __DIR__);
-ini_set('display_errors', true);
-error_reporting(E_ALL);
-date_default_timezone_set('Europe/Prague');
 
-set_error_handler('exceptions_error_handler');
-function exceptions_error_handler($severity, $message, $filename, $lineno)
-{
-    if (error_reporting() == 0) {
-        return;
-    }
-    if (error_reporting() & $severity) {
-        throw new ErrorException($message, 0, $severity, $filename, $lineno);
-    }
-}
+declare(strict_types=1);
 
-defined('KBDP_API_URL')
-|| define('KBDP_API_URL', getenv('KBDP_API_URL') ? getenv('KBDP_API_URL') : '');
-
-defined('KBDP_USERNAME')
-|| define('KBDP_USERNAME', getenv('KBDP_USERNAME') ? getenv('KBDP_USERNAME') : '');
-
-defined('KBDP_PASSWORD')
-|| define('KBDP_PASSWORD', getenv('KBDP_PASSWORD') ? getenv('KBDP_PASSWORD') : '');
-
-defined('KBDP_VENDOR')
-|| define('KBDP_VENDOR', getenv('KBDP_VENDOR') ? getenv('KBDP_VENDOR') : '');
+use Symfony\Component\Dotenv\Dotenv;
 
 require_once __DIR__ . '/../vendor/autoload.php';
+
+if (file_exists(dirname(__DIR__).'/.env.local')) {
+    (new Dotenv())->usePutenv(true)->bootEnv(dirname(__DIR__).'/.env.local', 'dev', []);
+}
+
+$requiredEnvs = ['KBDP_API_URL', 'KBDP_USERNAME', 'KBDP_PASSWORD', 'KBDP_VENDOR'];
+foreach ($requiredEnvs as $env) {
+    if (empty(getenv($env))) {
+        throw new Exception(sprintf('The "%s" environment variable is empty.', $env));
+    }
+}
