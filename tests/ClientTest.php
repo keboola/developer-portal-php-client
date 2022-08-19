@@ -44,11 +44,10 @@ class ClientTest extends TestCase
 
     public function testEmptyUrl(): void
     {
-        $client = new Client('');
-        $this->expectExceptionMessage('The provided API endpoint URL "" is invalid.');
         $this->expectExceptionCode(400);
         $this->expectException(ClientException::class);
-        $client->login((string) getenv('KBDP_USERNAME'), (string) getenv('KBDP_PASSWORD'));
+        $this->expectExceptionMessage('The provided API endpoint URL "" is invalid.');
+        $client = new Client('');
     }
 
     public function testSetCredentials(): void

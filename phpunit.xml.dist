@@ -7,11 +7,15 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="true"
-         stopOnError="true"
-         syntaxCheck="false"
+         stopOnError="true"         
          bootstrap="tests/bootstrap.php">
 
-    <testsuite name="API Test Suite">
+    <testsuite name="Test Suite">
         <directory>tests</directory>
     </testsuite>
+    <coverage>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </coverage>
 </phpunit>
