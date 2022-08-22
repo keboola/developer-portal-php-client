@@ -2,27 +2,61 @@
     "name": "keboola/developer-portal-php-client",
     "type": "library",
     "description": "PHP Client for Keboola Developer Portal",
-    "keywords": ["keboola"],
+    "keywords": ["keboola", "developer portal", "component"],
     "license": "MIT",
     "authors": [
         {
-            "name": "Jakub Matějka",
-            "email": "jakub@keboola.com"
+            "name": "Keboola",
+            "email": "devel@keboola.com"
         }
     ],
     "require": {
-        "php": ">=5.6",
-        "guzzlehttp/guzzle": "~6.0"
+        "php": "^7.4|^8.1",
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5",
-        "squizlabs/php_codesniffer": "~2.5"
+        "keboola/coding-standard": ">=14.0",
+        "phpstan/phpstan": "^1.8",
+        "phpstan/phpstan-phpunit": "^1.1",
+        "phpunit/phpunit": "^9.5.2",
+        "sempro/phpunit-pretty-print": "^1.4",
+        "symfony/dotenv": "^5.4"
     },
     "minimum-stability": "stable",
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "process-timeout": 3600,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
     "autoload": {
-        "psr-4": { "Keboola\\DeveloperPortal\\": "src/Keboola/DeveloperPortal" }
+        "psr-4": {
+            "Keboola\\DeveloperPortal\\": "src/"
+        }
     },
     "autoload-dev": {
-        "psr-4": { "Keboola\\DeveloperPortal\\Test\\": "tests/Keboola/DeveloperPortal" }
+        "psr-4": {
+            "Keboola\\DeveloperPortal\\Test\\": "tests/"
+        }
+    },
+    "scripts": {
+        "tests": "phpunit --coverage-clover build/logs/clover.xml --coverage-xml=build/logs/coverage-xml --log-junit=build/logs/phpunit.junit.xml",
+        "phpstan": "phpstan analyse --no-progress -c phpstan.neon",
+        "phpcs": "phpcs --extensions=php src tests",
+        "phpcbf": "phpcbf --extensions=php src tests",
+        "build": [
+            "@phpcs",
+            "@phpstan",
+            "@tests"
+        ],
+        "ci": [
+            "@composer validate --no-check-all --strict",
+            "@build"
+        ]
     }
 }

@@ -1,46 +1,41 @@
 <?php
-/**
- * @package developer-portal-php-client
- * @copyright Keboola
- * @author Jakub Matejka <jakub@keboola.com>
- */
+
+declare(strict_types=1);
+
 namespace Keboola\DeveloperPortal;
 
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Throwable;
 
 class Client
 {
     /**
      * Number of retries for one API call
      */
-    const RETRIES_COUNT = 5;
-    /**
-     * Back off time before retrying API call
-     */
-    const BACKOFF_INTERVAL = 10;
+    private const RETRIES_COUNT = 5;
 
-    const DEFAULT_CLIENT_SETTINGS = [
+    private const DEFAULT_CLIENT_SETTINGS = [
         'timeout' => 600,
         'headers' => [
             'accept' => 'application/json',
-            'content-type' => 'application/json; charset=utf-8'
-        ]
+            'content-type' => 'application/json; charset=utf-8',
+        ],
     ];
 
-    /** @var  \GuzzleHttp\Client */
-    private $guzzle;
-    private $guzzleOptions;
+    private GuzzleClient $guzzle;
+    private array $guzzleOptions;
 
-    private $username;
-    private $password;
+    private string $username;
+    private string $password;
 
-    private $token;
-    private $accessToken;
-    private $refreshToken;
+    private string $token;
+    private string $accessToken;
+    private string $refreshToken;
 
     /**
      * Client constructor
@@ -56,15 +51,16 @@ class Client
      *          'options' => GUZZLE HTTP CLIENT OPTIONS
      *      ]
      *
-     * @param $url
+     * @param string $url
      * @param array $options
+     * @throws Exception
      */
-    public function __construct($url = 'https://apps-api.keboola.com/', array $options = [])
+    public function __construct(string $url = 'https://apps-api.keboola.com/', array $options = [])
     {
         if (empty(trim($url))) {
             throw Exception::userError(sprintf('The provided API endpoint URL "%s" is invalid.', $url));
         }
-        if (substr($url, -1) != '/') {
+        if (substr($url, -1) !== '/') {
             $url .= '/';
         }
         $options['options']['base_uri'] = $url;
@@ -75,7 +71,10 @@ class Client
         }
     }
 
-    private function setCredentials($credentials)
+    /**
+     * @param array{token: string, accessToken: string, refreshToken:string} $credentials
+     */
+    private function setCredentials(array $credentials): void
     {
         foreach (['token', 'accessToken', 'refreshToken'] as $key) {
             if (!empty($credentials[$key])) {
@@ -84,22 +83,25 @@ class Client
         }
     }
 
-    private function initClient()
+    private function initClient(): void
     {
         $handlerStack = HandlerStack::create();
 
-        /** @noinspection PhpUnusedParameterInspection */
         $handlerStack->push(Middleware::retry(
-            function ($retries, RequestInterface $request, ResponseInterface $response = null, $error = null) {
-                return $response && $response->getStatusCode() == 503;
+            function (
+                int $retries,
+                RequestInterface $request,
+                ?ResponseInterface $response = null,
+                ?string $error = null
+            ) {
+                return $response && $response->getStatusCode() === 503;
             },
-            function ($retries) {
+            function (int $retries) {
                 return rand(60, 600) * 1000;
             }
         ));
-        /** @noinspection PhpUnusedParameterInspection */
         $handlerStack->push(Middleware::retry(
-            function ($retries, RequestInterface $request, ResponseInterface $response = null, $error = null) {
+            function ($retries, RequestInterface $request, ?ResponseInterface $response = null, ?string $error = null) {
                 if ($retries >= self::RETRIES_COUNT) {
                     return false;
                 } elseif ($response && $response->getStatusCode() > 499) {
@@ -115,41 +117,37 @@ class Client
             }
         ));
 
-        $this->guzzle = new \GuzzleHttp\Client(array_merge([
+        $this->guzzle = new GuzzleClient(array_merge([
             'handler' => $handlerStack,
-            'cookies' => true
+            'cookies' => true,
         ], $this->guzzleOptions));
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
 
-    public function getPassword()
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    public function getToken()
+    public function getToken(): string
     {
         return $this->token;
     }
 
-    /**
-     * @param $method
-     * @param $uri
-     * @param array $params
-     * @param array $headers
-     * @param int $retries
-     * @return array
-     * @throws Exception
-     */
-    public function request($method, $uri, $params = [], $headers = [], $retries = 5)
-    {
+    public function request(
+        string $method,
+        string $uri,
+        array $params = [],
+        array $headers = [],
+        int $retries = 5
+    ): array {
         $options = self::DEFAULT_CLIENT_SETTINGS;
         if ($params) {
-            if ($method == 'GET' || $method == 'DELETE') {
+            if ($method === 'GET' || $method === 'DELETE') {
                 $options['query'] = $params;
             } else {
                 $options['json'] = $params;
@@ -162,13 +160,13 @@ class Client
 
         try {
             $response = $this->guzzle->request($method, $uri, $options);
-            return json_decode($response->getBody(), true);
-        } catch (\Exception $e) {
+            return (array) json_decode($response->getBody()->getContents(), true);
+        } catch (Throwable $e) {
             $response = $e instanceof RequestException && $e->hasResponse() ? $e->getResponse() : null;
             if ($response) {
-                $responseBody = json_decode($response->getBody(), true);
-                if ($response->getStatusCode() == 401) {
-                    if ($uri == 'auth/login') {
+                $responseBody = (array) json_decode($response->getBody()->getContents(), true);
+                if ($response->getStatusCode() === 401) {
+                    if ($uri === 'auth/login') {
                         throw Exception::authError($uri, $responseBody);
                     }
                     if ($retries <= 0) {
@@ -185,17 +183,7 @@ class Client
         }
     }
 
-    /**
-     * Auth
-     */
-
-    /**
-     * @param $username
-     * @param $password
-     * @return mixed
-     * @throws Exception
-     */
-    public function login($username, $password)
+    public function login(string $username, string $password): array
     {
         $this->username = $username;
         $this->password = $password;
@@ -214,27 +202,20 @@ class Client
         return $response;
     }
 
-    /**
-     * @param $method
-     * @param $uri
-     * @param array $params
-     * @return array
-     * @throws Exception
-     */
-    public function authRequest($method, $uri, $params = [])
+    public function authRequest(string $method, string $uri, array $params = []): array
     {
         if (!$this->token) {
             throw Exception::userError('Call login for auth requests first');
         }
         return $this->request($method, $uri, $params, [
-            'Authorization' => $this->token
+            'Authorization' => $this->token,
         ]);
     }
 
-    public function refreshToken()
+    public function refreshToken(): string
     {
         $token = $this->request('GET', 'auth/token', [], [
-            'Authorization' => $this->refreshToken
+            'Authorization' => $this->refreshToken,
         ]);
 
         $this->token = $token['token'];
@@ -245,26 +226,16 @@ class Client
      * Admin API
      */
 
-    /**
-     * @param null $filter
-     * @param int $offset
-     * @param int $limit
-     * @return array
-     */
-    public function adminListAppsPaginated($filter = null, $offset = 0, $limit = 1000)
+    public function adminListAppsPaginated(?string $filter = null, int $offset = 0, int $limit = 1000): array
     {
         return $this->authRequest('GET', 'admin/apps', [
             'filter' => $filter,
             'offset' => $offset,
-            'limit' => $limit
+            'limit' => $limit,
         ]);
     }
 
-    /**
-     * @param null $filter
-     * @return array
-     */
-    public function adminListApps($filter = null)
+    public function adminListApps(?string $filter = null): array
     {
         $offset = 0;
         $limit = 1000;
@@ -278,11 +249,12 @@ class Client
     }
 
     /**
-     * @param $id
-     * @param array $options
+     * @param string $id
+     * @param array{published: bool} $options
      * @return array
+     * @throws Exception
      */
-    public function adminGetApp($id, $options = [])
+    public function adminGetApp(string $id, array $options = ['published' => false]): array
     {
         $uri = 'admin/apps/' . $id;
         if (!empty($options['published'])) {
@@ -295,25 +267,15 @@ class Client
      * Vendors
      */
 
-    /**
-     * @param $vendor
-     * @param int $offset
-     * @param int $limit
-     * @return array
-     */
-    public function listVendorsAppsPaginated($vendor, $offset = 0, $limit = 1000)
+    public function listVendorsAppsPaginated(string $vendor, int $offset = 0, int $limit = 1000): array
     {
         return $this->authRequest('GET', sprintf('vendors/%s/apps', $vendor), [
             'offset' => $offset,
-            'limit' => $limit
+            'limit' => $limit,
         ]);
     }
 
-    /**
-     * @param $id
-     * @return array
-     */
-    public function getAppDetail($vendor, $id)
+    public function getAppDetail(string $vendor, string $id): array
     {
         return $this->authRequest('GET', "vendors/$vendor/apps/$id");
     }
@@ -336,7 +298,7 @@ class Client
      * @param $params
      * @return array
      */
-    public function createApp($vendor, $params)
+    public function createApp(string $vendor, array $params): array
     {
         return $this->authRequest('POST', sprintf('vendors/%s/apps', $vendor), $params);
     }
@@ -344,11 +306,12 @@ class Client
     /**
      * Get Apps ECR repository credentials
      *
-     * @param $vendor
-     * @param $app
+     * @param string $vendor
+     * @param string $app
      * @return array
+     * @throws Exception
      */
-    public function getAppRepository($vendor, $app)
+    public function getAppRepository(string $vendor, string $app): array
     {
         return $this->authRequest('GET', sprintf('vendors/%s/apps/%s/repository', $vendor, $app));
     }
@@ -366,12 +329,13 @@ class Client
      *          ...
      *      ]
      *
-     * @param $vendor
-     * @param $id
-     * @param $params
+     * @param string $vendor
+     * @param string $id
+     * @param array $params
      * @return array
+     * @throws Exception
      */
-    public function updateApp($vendor, $id, $params)
+    public function updateApp(string $vendor, string $id, array $params): array
     {
         return $this->authRequest('PATCH', sprintf('vendors/%s/apps/%s', $vendor, $id), $params);
     }
@@ -380,24 +344,15 @@ class Client
      * Public API
      */
 
-    /**
-     * @param int $offset
-     * @param int $limit
-     * @return array
-     */
-    public function publicListVendorsPaginated($offset = 0, $limit = 1000)
+    public function publicListVendorsPaginated(int $offset = 0, int $limit = 1000): array
     {
         return $this->request('GET', 'vendors', [
             'offset' => $offset,
-            'limit' => $limit
+            'limit' => $limit,
         ]);
     }
 
-    /**
-     * @param $appId
-     * @return array
-     */
-    public function publicGetAppDetail($appId)
+    public function publicGetAppDetail(string $appId): array
     {
         return $this->request('GET', sprintf('apps/%s', $appId));
     }
