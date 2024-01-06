@@ -98,7 +98,7 @@ class Client
             },
             function (int $retries) {
                 return rand(60, 600) * 1000;
-            }
+            },
         ));
         $handlerStack->push(Middleware::retry(
             function ($retries, RequestInterface $request, ?ResponseInterface $response = null, ?string $error = null) {
@@ -114,7 +114,7 @@ class Client
             },
             function ($retries) {
                 return (int) pow(2, $retries - 1) * 1000;
-            }
+            },
         ));
 
         $this->guzzle = new GuzzleClient(array_merge([

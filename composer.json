@@ -21,6 +21,7 @@
         "phpstan/phpstan-phpunit": "^1.1",
         "phpunit/phpunit": "^9.5.2",
         "sempro/phpunit-pretty-print": "^1.4",
+        "squizlabs/php_codesniffer": "^3.8",
         "symfony/dotenv": "^5.4"
     },
     "minimum-stability": "stable",
