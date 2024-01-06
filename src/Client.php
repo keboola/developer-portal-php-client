@@ -33,9 +33,9 @@ class Client
     private string $username;
     private string $password;
 
-    private string $token;
-    private string $accessToken;
-    private string $refreshToken;
+    private ?string $token = null;
+    private ?string $accessToken = null;
+    private ?string $refreshToken = null;
 
     /**
      * Client constructor
@@ -133,8 +133,11 @@ class Client
         return $this->password;
     }
 
-    public function getToken(): string
+    public function getToken(): ?string
     {
+        if ($this->token === '') {
+            return null;
+        }
         return $this->token;
     }
 
