@@ -6,6 +6,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      - KBDP_API_URL
+      - KBDP_USERNAME
+      - KBDP_PASSWORD
+      - KBDP_VENDOR
     volumes:
       - ./build/logs/:/code/build/logs/
   dev:

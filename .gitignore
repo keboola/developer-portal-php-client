@@ -3,3 +3,6 @@ composer.lock
 composer.phar
 vendor
 tests.sh
+.env.local
+/build/
+/.phpunit.result.cache
