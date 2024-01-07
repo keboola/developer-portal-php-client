@@ -92,7 +92,7 @@ class Client
                 int $retries,
                 RequestInterface $request,
                 ?ResponseInterface $response = null,
-                ?string $error = null
+                ?string $error = null,
             ) {
                 return $response && $response->getStatusCode() === 503;
             },
@@ -146,7 +146,7 @@ class Client
         string $uri,
         array $params = [],
         array $headers = [],
-        int $retries = 5
+        int $retries = 5,
     ): array {
         $options = self::DEFAULT_CLIENT_SETTINGS;
         if ($params) {
