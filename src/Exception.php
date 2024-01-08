@@ -23,7 +23,7 @@ final class Exception extends BaseException
         string $uri,
         array $message,
         int $code = 0,
-        ?Throwable $previous = null
+        ?Throwable $previous = null,
     ): Exception {
         return new static("Error when calling uri $uri. Response: " . json_encode($message), $code, $previous);
     }

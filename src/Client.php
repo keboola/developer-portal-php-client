@@ -33,9 +33,9 @@ class Client
     private string $username;
     private string $password;
 
-    private string $token;
-    private string $accessToken;
-    private string $refreshToken;
+    private ?string $token = null;
+    private ?string $accessToken = null;
+    private ?string $refreshToken = null;
 
     /**
      * Client constructor
@@ -92,13 +92,13 @@ class Client
                 int $retries,
                 RequestInterface $request,
                 ?ResponseInterface $response = null,
-                ?string $error = null
+                ?string $error = null,
             ) {
                 return $response && $response->getStatusCode() === 503;
             },
             function (int $retries) {
                 return rand(60, 600) * 1000;
-            }
+            },
         ));
         $handlerStack->push(Middleware::retry(
             function ($retries, RequestInterface $request, ?ResponseInterface $response = null, ?string $error = null) {
@@ -114,7 +114,7 @@ class Client
             },
             function ($retries) {
                 return (int) pow(2, $retries - 1) * 1000;
-            }
+            },
         ));
 
         $this->guzzle = new GuzzleClient(array_merge([
@@ -133,8 +133,11 @@ class Client
         return $this->password;
     }
 
-    public function getToken(): string
+    public function getToken(): ?string
     {
+        if ($this->token === '') {
+            return null;
+        }
         return $this->token;
     }
 
@@ -143,7 +146,7 @@ class Client
         string $uri,
         array $params = [],
         array $headers = [],
-        int $retries = 5
+        int $retries = 5,
     ): array {
         $options = self::DEFAULT_CLIENT_SETTINGS;
         if ($params) {
