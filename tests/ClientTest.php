@@ -236,7 +236,7 @@ class ClientTest extends TestCase
         $keysToRemove = ['repository', 'version', 'createdOn', 'updatedOn', 'publishedVersion', 'updatedBy'];
         self::assertEquals(
             fn() => array_diff_key($app, array_flip($keysToRemove)),
-            fn() => array_diff_key($updatedApp, array_flip($keysToRemove))
+            fn() => array_diff_key($updatedApp, array_flip($keysToRemove)),
         );
     }
 }

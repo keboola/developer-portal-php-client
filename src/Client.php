@@ -229,22 +229,30 @@ class Client
      * Admin API
      */
 
-    public function adminListAppsPaginated(?string $filter = null, int $offset = 0, int $limit = 1000): array
-    {
-        return $this->authRequest('GET', 'admin/apps', [
+    public function adminListAppsPaginated(
+        ?string $filter = null,
+        int $offset = 0,
+        int $limit = 1000,
+        ?int $wave = null,
+    ): array {
+        $params = [
             'filter' => $filter,
             'offset' => $offset,
             'limit' => $limit,
-        ]);
+        ];
+        if ($wave !== null) {
+            $params['wave'] = $wave;
+        }
+        return $this->authRequest('GET', 'admin/apps', $params);
     }
 
-    public function adminListApps(?string $filter = null): array
+    public function adminListApps(?string $filter = null, ?int $wave = null): array
     {
         $offset = 0;
         $limit = 1000;
         $result = [];
         do {
-            $partialResult = $this->adminListAppsPaginated($filter, $offset, $limit);
+            $partialResult = $this->adminListAppsPaginated($filter, $offset, $limit, $wave);
             $result = array_merge($result, $partialResult);
             $offset += $limit;
         } while (count($partialResult));
@@ -253,15 +261,22 @@ class Client
 
     /**
      * @param string $id
-     * @param array{published: bool} $options
+     * @param array{published?: bool, wave?: int|null} $options
      * @return array
      * @throws Exception
      */
     public function adminGetApp(string $id, array $options = ['published' => false]): array
     {
         $uri = 'admin/apps/' . $id;
+        $query = [];
         if (!empty($options['published'])) {
-            $uri .= '?published=true';
+            $query['published'] = 'true';
+        }
+        if (isset($options['wave'])) {
+            $query['wave'] = $options['wave'];
+        }
+        if ($query) {
+            $uri .= '?' . http_build_query($query);
         }
         return $this->authRequest('GET', $uri);
     }
