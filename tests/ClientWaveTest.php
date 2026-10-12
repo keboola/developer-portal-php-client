@@ -137,11 +137,4 @@ class ClientWaveTest extends TestCase
         $client->publicGetAppDetail('keboola.ex-foo');
         self::assertSame('https://apps-api.example.com/apps/keboola.ex-foo', $this->getRequestUri(0));
     }
-
-    public function testPublicGetAppDetailWithWave(): void
-    {
-        $client = $this->createClient([['id' => 'keboola.ex-foo']]);
-        $client->publicGetAppDetail('keboola.ex-foo', 2);
-        self::assertSame('https://apps-api.example.com/apps/keboola.ex-foo?wave=2', $this->getRequestUri(0));
-    }
 }

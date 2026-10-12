@@ -370,12 +370,8 @@ class Client
         ]);
     }
 
-    public function publicGetAppDetail(string $appId, ?int $wave = null): array
+    public function publicGetAppDetail(string $appId): array
     {
-        $params = [];
-        if ($wave !== null) {
-            $params['wave'] = $wave;
-        }
-        return $this->request('GET', sprintf('apps/%s', $appId), $params);
+        return $this->request('GET', sprintf('apps/%s', $appId));
     }
 }
